@@ -17,20 +17,20 @@ namespace TTWebApp.Controllers
     {
         IRepository<Photo> photoRepository;
 
-        public PhotoController(IRepository<Photo> repository)
+        public PhotoController(IRepository<Photo> pRepository, IRepository<Author> aRepository)
         {
-            photoRepository = repository;
+            photoRepository = pRepository;
         }
 
         // GET: api/<PhotoController>
-        [HttpGet(Name = "GetItems")]
+        [HttpGet(Name = "GetPhotos")]
         public IEnumerable<Photo> Get()
         {
             return photoRepository.GetList();
         }
 
         // GET api/<PhotoController>/5
-        [HttpGet("{id}", Name = "GetItem")]
+        [HttpGet("{id}", Name = "GetPhoto")]
         public IActionResult Get(int id)
         {
             Photo photoItem = photoRepository.Get(id);
@@ -52,14 +52,14 @@ namespace TTWebApp.Controllers
                 return BadRequest();
             }
             photoRepository.Create(photo);
-            return CreatedAtRoute("GetItem", new { id = photo.Id }, photo);
+            return CreatedAtRoute("GetPhoto", new { id = photo.Id }, photo);
         }
 
         // PUT api/<PhotoController>/5
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] Photo updatedPhoto)
         {
-            if (updatedPhoto == null || updatedPhoto.Id != id)
+            if (updatedPhoto == null)
             {
                 return BadRequest();
             }
@@ -69,17 +69,24 @@ namespace TTWebApp.Controllers
             {
                 return NotFound();
             }
-
+            updatedPhoto.Id = id;
             photoRepository.Update(updatedPhoto);
-            return RedirectToRoute("GetAllItems");
+            return CreatedAtRoute("GetPhoto", new { id = updatedPhoto.Id }, updatedPhoto);
         }
 
         // DELETE api/<PhotoController>/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var deletedItem = photoRepository.Delete(id);
-
+            Photo deletedItem = null;
+            try
+            {
+                deletedItem = photoRepository.Delete(id);
+            }
+            catch
+            {
+                return BadRequest();
+            }
             if (deletedItem == null)
             {
                 return BadRequest();

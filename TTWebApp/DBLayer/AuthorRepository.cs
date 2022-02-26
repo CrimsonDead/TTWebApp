@@ -25,12 +25,19 @@ namespace TTWebApp.DBLayer
         public Author Delete(int id)
         {
             Author author = Get(id);
-            if (author != null)
+            try
             {
-                context.Authors.Remove(author);
-                context.SaveChanges();
+                if (author != null)
+                {
+                    context.Authors.Remove(author);
+                    context.SaveChanges();
+                }
+                return author;
             }
-            return author;
+            catch
+            {
+                throw;
+            }
         }
 
         public virtual void Dispose(bool disposing)
@@ -68,9 +75,11 @@ namespace TTWebApp.DBLayer
 
         public void Update(Author updatedItem)
         {
-            context.Entry(updatedItem).State = EntityState.Modified;
             Author currentAuthor = Get(updatedItem.Id);
-            currentAuthor = (Author)updatedItem.Clone();
+            currentAuthor.Age = updatedItem.Age;
+            currentAuthor.DateOfCreation = updatedItem.DateOfCreation;
+            currentAuthor.Name = updatedItem.Name;
+            currentAuthor.NickName = updatedItem.NickName;
             context.Authors.Update(currentAuthor);
             context.SaveChanges();
         }

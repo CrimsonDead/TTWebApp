@@ -25,12 +25,19 @@ namespace TTWebApp.DBLayer
         public Text Delete(int id)
         {
             Text text = Get(id);
-            if (text != null)
+            try
             {
-                context.Texts.Remove(text);
-                context.SaveChanges();
+                if (text != null)
+                {
+                    context.Texts.Remove(text);
+                    context.SaveChanges();
+                }
+                return text;
             }
-            return text;
+            catch
+            {
+                throw;
+            }
         }
 
         public virtual void Dispose(bool disposing)
@@ -68,9 +75,13 @@ namespace TTWebApp.DBLayer
 
         public void Update(Text updatedItem)
         {
-            context.Entry(updatedItem).State = EntityState.Modified;
             Text currentText = Get(updatedItem.Id);
-            currentText = (Text)updatedItem.Clone();
+            currentText.AuthorId = updatedItem.AuthorId;
+            currentText.Cost = updatedItem.Cost;
+            currentText.DateOfCreation = updatedItem.DateOfCreation;
+            currentText.NumberOfPurchase = updatedItem.NumberOfPurchase;
+            currentText.Content = updatedItem.Content;
+            currentText.Size = updatedItem.Size;
             context.Texts.Update(currentText);
             context.SaveChanges();
         }

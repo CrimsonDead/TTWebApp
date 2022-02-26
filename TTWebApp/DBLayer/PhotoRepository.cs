@@ -24,14 +24,20 @@ namespace TTWebApp.DBLayer
         public Photo Delete(int id)
         {
             Photo photo = Get(id);
-            if (photo != null)
+            try
             {
-                context.Photos.Remove(photo);
-                context.SaveChanges();
+                if (photo != null)
+                {
+                    context.Photos.Remove(photo);
+                    context.SaveChanges();
+                }
+                return photo;
             }
-            return photo;
+            catch 
+            {
+                throw;
+            }
         }
-
         public virtual void Dispose(bool disposing)
         {
             if (!this.disposed)
@@ -67,9 +73,14 @@ namespace TTWebApp.DBLayer
         
         public void Update(Photo updatedItem)
         {
-            context.Entry(updatedItem).State = EntityState.Modified;
             Photo currentPhoto = Get(updatedItem.Id);
-            currentPhoto = (Photo)updatedItem.Clone();
+            currentPhoto.AuthorId = updatedItem.AuthorId;
+            currentPhoto.Cost = updatedItem.Cost;
+            currentPhoto.DateOfCreation = updatedItem.DateOfCreation;
+            currentPhoto.Link = updatedItem.Link;
+            currentPhoto.Name = updatedItem.Name;
+            currentPhoto.NumberOfPurchase = updatedItem.NumberOfPurchase;
+            currentPhoto.Size = updatedItem.Size;
             context.Photos.Update(currentPhoto);
             context.SaveChanges();
         }
